@@ -7,14 +7,14 @@
   const get_bit = (num, pos) => (num >> pos) & 1;
 
   // Combines 3 bits into an integer between 0 and 7
-  const get_int = (b1, b2, b3) => (b1 << 2) + (b2 << 1) + b3;
+  const combine = (b1, b2, b3) => b1 * 4 + b2 * 2 + b3;
 
   // Returns given number in the form of a tertiary function (a rule)
-  const get_rule = num => (n1, n2, n3) => get_bit(num, get_int(n1, n2, n3));
+  const get_rule = num => (b1, b2, b3) => get_bit(num, combine(b1, b2, b3));
 
   const canvas_width = 1000;
   const canvas_height = 500;
-  const grid_dim = 100; // Number of cells in the dimension of the grid.
+  const grid_dim = 250; // Number of cells in the dimension of the grid.
 
   const cell_scale = canvas_width / grid_dim;
   const iterations = canvas_height / cell_scale;
@@ -23,7 +23,7 @@
     const canvas = setup_canvas(document);
     document.body.appendChild(canvas);
 
-    draw_rule(canvas.getContext('2d'), get_rule(30));
+    draw_rule(canvas.getContext('2d'), get_rule(150));
   };
 
   function draw_rule(ctx, rule) {
