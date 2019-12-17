@@ -53,4 +53,59 @@ Now it just a matter of putting these two functions together:
 const get_rule = num => (b1, b2, b3) => get_bit(num, combine(b1, b2, b3));
 ```
 
-Cool! We now have a function that for each number between 0 and 256 gives us a unique ECA rule that we can do whatever we want with.
+Cool! We now have a function that for each number between 0 and 256 gives us a unique ECA rule that we can do whatever we want with. The next step is to visualise them in the browser.
+
+## Visualising rules
+
+We will use a canvas element to visualise our automata in the browser. A canvas element can be created and added to the body of your html in the following way:
+
+```javascript
+window.onload = function() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 800;
+
+  document.body.appendChild(canvas);
+};
+```
+
+In order to interact with our canvas, we need a _context_. A context is what lets us draw shapes and lines, colorize things, and move around in our canvas. It is provided for us through the [`getContext`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) method on our canvas.
+
+```javascript
+const context = canvas.getContext('2d');
+```
+
+The parametre `'2d'` refers to the context type we will be using in this example.
+
+Next, let's make a function that, given a context and an ECA rule, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; the pseudo code being something like this:
+
+```javascript
+draw_rule(context, rule) {
+  current_row = initial_row()
+  for(30 times) {
+    draw_row(context, current_row)
+    current_row = next_row(current_row, rule)
+  }
+}
+```
+
+We start of with some initial collection of cells as our current row. This row, like in the examples above, usually contains all 0s except for a 1 in the middle cell, but it can also contain a completely random string on 1s and 0s. We draw this row of cells, then calculate the next row of values based on our current row, using our rule. Then we simply repeat drawing and calculating new steps until we feel that our grid is tall enough.
+
+This pseudo code requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
+
+`initial_row` a simple function. Return an array of 0s where the middle element is a 1.
+
+```javascript
+function initial_row() {
+  const initial_row = Array(grid_dim).fill(0);
+  initial_row[Math.floor(grid_dim / 2)] = 1;
+
+  return initial_row;
+}
+```
+
+With our rule function readily available, the `next_row` function can be written as a oneliner. Each cell value in the new row is the product of our rule with the nearby cell values in the old row as input.
+
+```javascript
+const next_row = (row, rule) => row.map((_, i) => rule(row[i - 1], row[i], row[i + 1]));
+```
