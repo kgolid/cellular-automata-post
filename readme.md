@@ -16,7 +16,7 @@ You might wonder why the above rules have numbers attached to them. This is beca
 
 ![From number to rule](https://i.ibb.co/kHg2wbX/cell1.png)
 
-Any number in the interval from 0 to (but not including) 256 can be represented in binary using only 8 digits (first arrow above). Furthermore, we can give each of these 8 digits an index based on their positioning (second arrow). These indices will naturally range from 0 to 7, which coincidentally are numbers that can be represented in binary using only 3 digits (third arrow). By interpreting these 3 digits as input, and the corresponding digit from our original number as output, we get the tertiary function we are looking for (fourth arrow).
+Any number in the interval from 0 up to (but not including) 256 can be represented in binary using only 8 digits (first arrow above). Furthermore, we can give each of these 8 digits an index based on their positioning (second arrow). These indices will naturally range between 0 and 7, which coincidentally are numbers that can be represented in binary using only 3 digits (third arrow). By interpreting these 3 digits as input, and the corresponding digit from our original number as output, we get the tertiary function we are looking for (fourth arrow).
 
 ## Generating rules
 
@@ -69,22 +69,22 @@ window.onload = function() {
 };
 ```
 
-In order to interact with our canvas, we need a _context_. A context is what lets us draw shapes and lines, colorize things, and move around in our canvas. It is provided for us through the [`getContext`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) method on our canvas.
+In order to interact with our canvas, we need a _context_. A context is what lets us draw shapes and lines, colorize things, and move around on our canvas. It is provided for us through the [`getContext`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) method on our canvas.
 
 ```javascript
 const context = canvas.getContext('2d');
 ```
 
-The parametre `'2d'` refers to the context type we will be using in this example.
+The `'2d'` parameter refers to the context type we will be using in this example.
 
-Next, let's make a function that, given a context, an ECA rule and some info on the scale and number of our cells, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; the pseudo code being something like this:
+Next, let's make a function that, given a context, an ECA rule and some info on the scale and number of our cells, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; with the main part of the code looking something like this:
 
 ```javascript
-draw_rule(context, rule, scale, width, height) {
-  row = initial_row(width)
-  for([height] times) {
-    draw_row(context, row, scale)
-    row = next_row(row, rule)
+function draw_rule(ctx, rule, scale, width, height) {
+  let row = initial_row(width);
+  for (let i = 0; i < height; i++) {
+    draw_row(ctx, row, scale);
+    row = next_row(row, rule);
   }
 }
 ```
@@ -93,7 +93,7 @@ We start of with some initial collection of cells as our current row. This row, 
 
 This pseudo code requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
 
-`initial_row` a simple function. Make an array of 0s and change the element in the middle of the array to a 1.
+`initial_row` is a simple function. Make an array of 0s and change the element in the middle of the array to a 1.
 
 ```javascript
 function initial_row(length) {
@@ -134,4 +134,32 @@ This is where we are heavily depending on our context object, utilizing no less 
 - `fillStyle` specifies what you want to fill your shapes with. It can be a color, like `"#f55"`, but also a gradient or a pattern. We use it to distinguish between 0-cells and 1-cells.
 - `fillRect(x, y, w, h)` draws a rectangle from point (x,y) with width w and height h, filled according to the `fillStyle`. Our rectangles are simple squares, but you might be surprised that they all are positioned in origo. This is because we use it in conjunction with `translate`.
 - `translate(x, y)` lets you move the whole coordinate system around. This persists, so it works as a great alternative to keeping track of the different positions of items. For instance, instead of calculating the position of each individual cell in our grid, we can just draw a cell, move to the right, draw a new cell and so on.
-- `save()` and `restore()` is used together with `translate` and other coordinate-manipulating methods. We use them to _save_ the current coordinate system at a certain point, so that we at a later point may return to it (using _restore_). In our case, we save our coordinate system before we start drawing a row and move to the right. Then, when we are done drawing the row and are all the way to the right, we restore, so we get back to our initial state. Finally we move down so that we are ready to start drawing the next row.
+- `save()` and `restore()` is used together with `translate` and other coordinate-transforming methods. We use them to _save_ the current coordinate system at a certain point, so that we at a later point may return to it (using _restore_). In our case, we save our coordinate system before we start drawing a row and move to the right. Then, when we are done drawing the row and are all the way to the right, we restore, so we get back to our initial state. Finally we move down so that we are ready to start drawing the next row.
+
+We now have all the parts needed for our `draw_rule` function. We will use this function on `window.onload` after having set up the canvas. We also define the parameters we need.
+
+```javascript
+window.onload = function() {
+  const width = 1000; // Width of the canvas
+  const height = 500; // Height of the canvas
+
+  const cells_across = 200; // Number of cells horizontally in the grid
+  const cell_scale = width / cells_across; // Size of each cell
+  const cells_down = height / cell_scale; // Number of cells vertically in the grid
+
+  const rule = get_rule(30); // The rule to display
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  document.body.appendChild(canvas);
+  
+  const context = canvas.getContext('2d');
+  draw_rule(context, rule, cell_scale, cells_across, cells_down)
+};
+```
+
+We extract the canvas dimensions as individual variables together with the number of cells horizontally. Then, we calculate the `cell_scale` and 'cells_down' so that the grid fills the whole canvas while keeping cells square. This way, we can now easily change the "resolution" of our grid while still keeping it within the bounds of the canvas.
+
+...and that's it!
