@@ -77,14 +77,14 @@ const context = canvas.getContext('2d');
 
 The parametre `'2d'` refers to the context type we will be using in this example.
 
-Next, let's make a function that, given a context and an ECA rule, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; the pseudo code being something like this:
+Next, let's make a function that, given a context, an ECA rule and some info on the scale and number of our cells, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; the pseudo code being something like this:
 
 ```javascript
-draw_rule(context, rule) {
-  current_row = initial_row()
-  for(30 times) {
-    draw_row(context, current_row)
-    current_row = next_row(current_row, rule)
+draw_rule(context, rule, scale, width, height) {
+  row = initial_row(width)
+  for([height] times) {
+    draw_row(context, row, scale)
+    row = next_row(row, rule)
   }
 }
 ```
@@ -93,12 +93,12 @@ We start of with some initial collection of cells as our current row. This row, 
 
 This pseudo code requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
 
-`initial_row` a simple function. Return an array of 0s where the middle element is a 1.
+`initial_row` a simple function. Make an array of 0s and change the element in the middle of the array to a 1.
 
 ```javascript
-function initial_row() {
-  const initial_row = Array(grid_dim).fill(0);
-  initial_row[Math.floor(grid_dim / 2)] = 1;
+function initial_row(length) {
+  const initial_row = Array(length).fill(0);
+  initial_row[Math.floor(length / 2)] = 1;
 
   return initial_row;
 }
@@ -109,3 +109,29 @@ With our rule function readily available, the `next_row` function can be written
 ```javascript
 const next_row = (row, rule) => row.map((_, i) => rule(row[i - 1], row[i], row[i + 1]));
 ```
+
+Do you notice our cheat in the line above? Each cell in our new row needs input from three other cells, but the two pixels at each edge of the row only gets input from two. For instance, `next_row[0]` tries to get an input value from `row[-1]`. This works because javascript returns `undefined` when attempting to access values at indices that don't exist in an array, and it so happens that `(undefined >> [any number])` (from our combine function) always returns 0. This means that we in reality treat every value outside our grid as a 0.
+
+I know, it's not pretty, but we are making something really pretty on the screen very soon, so we are excused.
+
+Next up is our `draw_row` function; the one that actually does the drawing!
+
+```javascript
+function draw_row(ctx, row, scale) {
+  ctx.save();
+  row.forEach(cell => {
+    ctx.fillStyle = cell === 1 ? '#000' : '#fff';
+    ctx.fillRect(0, 0, scale, scale);
+    ctx.translate(scale, 0);
+  });
+  ctx.restore();
+  ctx.translate(0, scale);
+}
+```
+
+This is where we are heavily depending on our context object, utilizing no less than 5 different methods from it. Let's take a quick look at each one, and how we use them.
+
+- `fillStyle` specifies what you want to fill your shapes with. It can be a color, like `"#f55"`, but also a gradient or a pattern. We use it to distinguish between 0-cells and 1-cells.
+- `fillRect(x, y, w, h)` draws a rectangle from point (x,y) with width w and height h, filled according to the `fillStyle`. Our rectangles are simple squares, but you might be surprised that they all are positioned in origo. This is because we use it in conjunction with `translate`.
+- `translate(x, y)` lets you move the whole coordinate system around. This persists, so it works as a great alternative to keeping track of the different positions of items. For instance, instead of calculating the position of each individual cell in our grid, we can just draw a cell, move to the right, draw a new cell and so on.
+- `save()` and `restore()` is used together with `translate` and other coordinate-manipulating methods. We use them to _save_ the current coordinate system at a certain point, so that we at a later point may return to it (using _restore_). In our case, we save our coordinate system before we start drawing a row and move to the right. Then, when we are done drawing the row and are all the way to the right, we restore, so we get back to our initial state. Finally we move down so that we are ready to start drawing the next row.
