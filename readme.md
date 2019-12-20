@@ -34,7 +34,7 @@ In the above example, running `rule30(1,1,0)` will combine the three binary valu
 Knowing that the three binary input variables will be combined into one number, let's start by implementing such a `combine` function.
 
 ```javascript
-const combine = (b1, b2, b3) => (b1 << 2) + (b2 << 1) + b3;
+const combine = (b1, b2, b3) => (b1 << 2) + (b2 << 1) + (b3 << 0);
 ```
 
 By left-shifting the arguments to their appropriate positions, then adding the three shifted numbers, we get the combination we were looking for.
@@ -110,7 +110,7 @@ With our rule function readily available, the `next_row` function can be written
 const next_row = (row, rule) => row.map((_, i) => rule(row[i - 1], row[i], row[i + 1]));
 ```
 
-Do you notice our cheat in the line above? Each cell in our new row needs input from three other cells, but the two pixels at each edge of the row only gets input from two. For instance, `next_row[0]` tries to get an input value from `row[-1]`. This works because javascript returns `undefined` when attempting to access values at indices that don't exist in an array, and it so happens that `(undefined >> [any number])` (from our combine function) always returns 0. This means that we in reality treat every value outside our grid as a 0.
+Do you notice our cheat in the line above? Each cell in our new row needs input from three other cells, but the two cells at each edge of the row only gets input from two. For instance, `next_row[0]` tries to get an input value from `row[-1]`. This works because javascript returns `undefined` when attempting to access values at indices that don't exist in an array, and it so happens that `(undefined >> [any number])` (from our combine function) always returns 0. This means that we in reality treat every value outside our grid as a 0.
 
 I know, it's not pretty, but we are making something really pretty on the screen very soon, so we are excused.
 
@@ -154,12 +154,44 @@ window.onload = function() {
   canvas.height = height;
 
   document.body.appendChild(canvas);
-  
+
   const context = canvas.getContext('2d');
-  draw_rule(context, rule, cell_scale, cells_across, cells_down)
+  draw_rule(context, rule, cell_scale, cells_across, cells_down);
 };
 ```
 
 We extract the canvas dimensions as individual variables together with the number of cells horizontally. Then, we calculate the `cell_scale` and 'cells_down' so that the grid fills the whole canvas while keeping cells square. This way, we can now easily change the "resolution" of our grid while still keeping it within the bounds of the canvas.
 
-...and that's it!
+![Resolution](img/resolution.png)
+
+...and that's it! The full code example can be seen [here](https://github.com/kgolid/cellular-automata-post/blob/master/index.js).
+
+## Onward from here
+
+Having this setup now lets you explore all the 256 different rule one by one, either by iterating through each one by changing the code, or by letting the rule number be random at every page load. Either way, it is a great feeling to explore these unpredictable results within your own controlled environment.
+
+Another thing to explore is letting the initial cell state of our automata be random rather than our static "only 0s, but a single 1" state. This will yield even more unpredictable results. Such a variant of our `initial_row` can be written like this:
+
+```javascript
+function random_initial_row(width) {
+  return Array.from(Array(width), _ => Math.floor(Math.random() * 2));
+}
+```
+
+You can see below how big of an effect this change in the initial row has on the output.
+
+![Random initial row](img/rand_init.png)
+
+This is only one of the things you can change though! Why limit ourselves to two colors? Why limit ourselves to squares? Why only 2 dimensions? Why only one rule at a time?
+
+Below are some examples of ECA-based visualizations, but with an alternative `draw_rule` function, drawing lines in an isometric pattern rather than squares, then filling areas defined by those lines with colors. You can even choose to not display the separating lines at all, only showing the colors.
+
+![Alternative display of cellular automata](img/hexa_progress.jpg)
+
+Taking it even further, one can start introducing symmetries, both rotational (middle row) or reflectional (bottom row).
+
+![Further variants of cellular automata](img/hexa_variant.jpg)
+
+If you find the above visuals intriguing, feel free to check out [this interactive playground](https://generated.space/sketch/hatch-automata-full/#53:156:110), or even better, start from the code we've built here, and try coming up with you own ECA visualisation!
+
+Good luck!
