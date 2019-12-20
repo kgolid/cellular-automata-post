@@ -1,42 +1,32 @@
 import { get_rule } from './automata';
 
 window.onload = function() {
-  const width = 1000;
-  const height = 500;
+  const width = 1000; // Width of the canvas
+  const height = 500; // Height of the canvas
 
-  const cells_across = 200;
-  const cell_scale = width / cells_across;
-  const cells_down = height / cell_scale;
+  const cells_across = 200; // Number of cells horizontally in the grid
+  const cell_scale = width / cells_across; // Size of each cell
+  const cells_down = height / cell_scale; // Number of cells vertically in the grid
 
-  const rule = get_rule(30);
+  const rule = get_rule(30); // The rule to display
 
-  const canvas = setup_canvas(document, width, height);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
   document.body.appendChild(canvas);
-
+  
   const context = canvas.getContext('2d');
-  draw_rule(context, rule, cell_scale, cells_across, cells_down);
+  draw_rule(context, rule, cell_scale, cells_across, cells_down)
 };
 
 function draw_rule(ctx, rule, scale, width, height) {
   let row = initial_row(width);
   for (let i = 0; i < height; i++) {
     draw_row(ctx, row, scale);
-    s;
     row = next_row(row, rule);
   }
 }
-/*
-function draw_rule(ctx, rule) {
-  make_grid(rule).forEach(r => draw_row(ctx, r));
-}
-
-function make_grid(rule, height) {
-  return [...Array(height)].reduce(
-    (acc, _) => [...acc, next_row(acc[acc.length - 1], rule)],
-    [initial_row()]
-  );
-}
-*/
 
 function draw_row(ctx, row, scale) {
   ctx.save();
@@ -62,12 +52,4 @@ function initial_row(width) {
 
 function initial_random_row(width) {
   return Array.from(Array(width), _ => Math.floor(Math.random() * 2));
-}
-
-function setup_canvas(document, width, height) {
-  var canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  return canvas;
 }
