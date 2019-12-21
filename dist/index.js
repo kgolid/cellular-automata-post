@@ -13,16 +13,19 @@
   const get_rule = num => (b1, b2, b3) => get_bit(num, combine(b1, b2, b3));
 
   window.onload = function() {
-    const width = 1000;
-    const height = 500;
+    const width = 1000; // Width of the canvas
+    const height = 500; // Height of the canvas
 
-    const cells_across = 200;
-    const cell_scale = width / cells_across;
-    const cells_down = height / cell_scale;
+    const cells_across = 180; // Number of cells horizontally in the grid
+    const cell_scale = width / cells_across; // Size of each cell
+    const cells_down = height / cell_scale; // Number of cells vertically in the grid
 
-    const rule = get_rule(30);
+    const rule = get_rule(30); // The rule to display
 
-    const canvas = setup_canvas(document, width, height);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
     document.body.appendChild(canvas);
 
     const context = canvas.getContext('2d');
@@ -33,21 +36,9 @@
     let row = initial_row(width);
     for (let i = 0; i < height; i++) {
       draw_row(ctx, row, scale);
-      row = next_row$1(row, rule);
+      row = next_row(row, rule);
     }
   }
-  /*
-  function draw_rule(ctx, rule) {
-    make_grid(rule).forEach(r => draw_row(ctx, r));
-  }
-
-  function make_grid(rule, height) {
-    return [...Array(height)].reduce(
-      (acc, _) => [...acc, next_row(acc[acc.length - 1], rule)],
-      [initial_row()]
-    );
-  }
-  */
 
   function draw_row(ctx, row, scale) {
     ctx.save();
@@ -60,7 +51,7 @@
     ctx.translate(0, scale);
   }
 
-  function next_row$1(old, rule) {
+  function next_row(old, rule) {
     return old.map((_, i) => rule(old[i - 1], old[i], old[i + 1]));
   }
 
@@ -69,14 +60,6 @@
     initial_row[Math.floor(width / 2)] = 1;
 
     return initial_row;
-  }
-
-  function setup_canvas(document, width, height) {
-    var canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-
-    return canvas;
   }
 
 }));
