@@ -1,10 +1,10 @@
-A cellular automaton is a system consisting of cells of numerical values on a grid, together with a rule that decides the behaviour of these cells. By applying this rule repeatedly on each cell in the grid while visualising the grid in some way or another, one often gets the effect of some evolving organism with complex and intricate behavior, even from relatively simple rules.
+A cellular automaton is a system consisting of cells of numerical values on a grid, together with a rule that decides the behaviour of these cells. By applying the rule repeatedly on each cell in the grid while visualising the grid in some way or another, one often gets the effect of some evolving organism with complex and intricate behavior, even from relatively simple rules.
 
-Cellular automata comes in many shapes, forms and dimensions. Perhaps the most famous cellular automaton is called _Game of Life_ (GOL). It consists of a two-dimensional grid where each cell contain a boolean value (dead or alive). The accompanying rule decides whether or not a cell should be dead or alive based on that cell's neighbouring cells. It states that a live cell dies of loneliness if there are less than 2 live cells around it. Similarly, it dies of overcrowding if more than three neighbouring cells are alive. In other words, a cell will only "survive" by having exactly 2 or 3 neighbouring cells that are alive. For a _dead_ cell to become alive, it needs to have exactly 3 live neighbouring cells, otherwise it stays dead. An example of the GoL automaton can be seen below, iterating rapidly through several states.
+Cellular automata comes in many shapes, forms and dimensions. Perhaps the most famous cellular automaton is [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) (GOL). It consists of a two-dimensional grid where each cell contain a boolean value (dead or alive). The accompanying rule decides whether or not a cell should be dead or alive based on that cell's neighbouring cells. It states that a live cell dies of loneliness if there are less than 2 live cells around it. Similarly, it dies of overcrowding if more than three neighbouring cells are alive. In other words, a cell will only "survive" by having exactly 2 or 3 neighbouring cells that are alive. For a _dead_ cell to become alive, it needs to have exactly 3 live neighbouring cells, otherwise it stays dead. An example of the GoL automaton can be seen below, iterating rapidly through several states.
 
 ![Game of Life](https://i.imgur.com/ZRY1IlT.gif)
 
-Another famous cellular automaton variant is a one-dimensional one, called the _Elementary Cellular Automaton_ (ECA). This is the one we will be implementing in this post.
+Another famous cellular automaton variant is a one-dimensional one, called the [Elementary Cellular Automaton](https://en.wikipedia.org/wiki/Elementary_cellular_automaton) (ECA). This is the one we will be implementing in this post.
 
 Each state of this automaton is stored as a one-dimensional boolean array, and while GOL requires two dimensions to visualise its state, this automaton requires only a single line of values. Because of this, we can use two dimensions (rather than an animation) to visualise the whole state history of this automaton. As with GOL, the state of a cell in this automaton is either 0 or 1, but while a cell in GOL is updated based on its 8 neighbours, ECA has its cell updated based on its left neighbour, its right neighbour and itself!
 
@@ -91,7 +91,7 @@ function draw_rule(ctx, rule, scale, width, height) {
 
 We start off with some initial collection of cells as our current row. This row, like in the examples above, usually contains all 0s except for a 1 in the middle cell, but it can also contain a completely random string on 1s and 0s. We draw this row of cells, then calculate the next row of values based on our current row, using our rule. Then we simply repeat drawing and calculating new steps until we feel that our grid is tall enough.
 
-This pseudo code requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
+The above code snippet requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
 
 `initial_row` is a simple function. Make an array of 0s and change the element in the middle of the array to a 1.
 
@@ -190,10 +190,10 @@ Below are some examples of ECA-based visualisations, but with an alternative `dr
 
 ![Alternative display of cellular automata](https://i.ibb.co/GFZVfLD/hexa-progress.jpg)
 
-Taking it even further, one can start introducing symmetries, both rotational (middle row) or reflectional (bottom row).
+Taking it even further, one can start introducing symmetries, both rotational (middle row) and reflectional (bottom row).
 
 ![Further variants of cellular automata](https://i.ibb.co/jbzZVX0/hexa-variant.jpg)
 
-If you find the above visuals intriguing, feel free to check out [this interactive playground](https://generated.space/sketch/hatch-automata-full/#53:156:110), or even better, start from the code we've built here and try coming up with your very own cellular automata!
+If you find the above visuals interesting, feel free to check out [this interactive playground](https://generated.space/sketch/hatch-automata-full/#53:156:110), or even better, start from the code we've built here and try coming up with your very own cellular automata!
 
 Good luck!
