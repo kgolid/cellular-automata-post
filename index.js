@@ -4,7 +4,7 @@ window.onload = function() {
   const width = 1000; // Width of the canvas
   const height = 500; // Height of the canvas
 
-  const cells_across = 200; // Number of cells horizontally in the grid
+  const cells_across = 180; // Number of cells horizontally in the grid
   const cell_scale = width / cells_across; // Size of each cell
   const cells_down = height / cell_scale; // Number of cells vertically in the grid
 
@@ -15,9 +15,9 @@ window.onload = function() {
   canvas.height = height;
 
   document.body.appendChild(canvas);
-  
+
   const context = canvas.getContext('2d');
-  draw_rule(context, rule, cell_scale, cells_across, cells_down)
+  draw_rule(context, rule, cell_scale, cells_across, cells_down);
 };
 
 function draw_rule(ctx, rule, scale, width, height) {
@@ -50,6 +50,6 @@ function initial_row(width) {
   return initial_row;
 }
 
-function initial_random_row(width) {
+function random_initial_row(width) {
   return Array.from(Array(width), _ => Math.floor(Math.random() * 2));
 }
