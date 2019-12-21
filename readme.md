@@ -16,11 +16,11 @@ You might wonder why the above rules have numbers attached to them. This is beca
 
 ![From number to rule](https://i.ibb.co/kHg2wbX/cell1.png)
 
-Any number in the interval from 0 up to (but not including) 256 can be represented in binary using only 8 digits (first arrow above). Furthermore, we can give each of these 8 digits an index based on their positioning (second arrow). These indices will naturally range between 0 and 7, which coincidentally are numbers that can be represented in binary using only 3 digits (third arrow). By interpreting these 3 digits as input, and the corresponding digit from our original number as output, we get the tertiary function we are looking for (fourth arrow).
+Any number in the interval from 0 through 255 can be represented in binary using only 8 digits (first arrow above). Furthermore, we can give each of these 8 digits an index based on their positioning (second arrow). These indices will naturally range between 0 and 7, which coincidentally are numbers that can be represented in binary using only 3 digits (third arrow). By interpreting these 3 digits as input, and the corresponding digit from our original number as output, we get the tertiary function we are looking for (fourth arrow).
 
 ## Generating rules
 
-Let's implement the above interpretation as a higher-order function `get_rule` that takes a number between 0 and 256 as its input and returns the ECA rule corresponding to that number.
+Let's implement the above interpretation as a higher-order function `get_rule` that takes a number between 0 and 255 as its input and returns the ECA rule corresponding to that number.
 
 We want it to work somewhat like this:
 
@@ -53,7 +53,7 @@ Now it just a matter of putting these two functions together:
 const get_rule = num => (b1, b2, b3) => get_bit(num, combine(b1, b2, b3));
 ```
 
-Cool! We now have a function that for each number between 0 and 256 gives us a unique ECA rule that we can do whatever we want with. The next step is to visualise them in the browser.
+Cool! We now have a function that for each number between within our interval gives us a unique ECA rule that we can do whatever we want with. The next step is to visualise them in the browser.
 
 ## Visualising rules
 
@@ -69,7 +69,7 @@ window.onload = function() {
 };
 ```
 
-In order to interact with our canvas, we need a _context_. A context is what lets us draw shapes and lines, colorize things, and move around on our canvas. It is provided for us through the [`getContext`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) method on our canvas.
+In order to interact with our canvas, we need a _context_. A context is what lets us draw shapes and lines, give things colour, and generally move around on our canvas. It is provided for us through the [`getContext`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) method on our canvas.
 
 ```javascript
 const context = canvas.getContext('2d');
@@ -77,7 +77,7 @@ const context = canvas.getContext('2d');
 
 The `'2d'` parameter refers to the context type we will be using in this example.
 
-Next, let's make a function that, given a context, an ECA rule and some info on the scale and number of our cells, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; with the main part of the code looking something like this:
+Next, we make a function that, given a context, an ECA rule and some info on the scale and number of our cells, draws the rule onto our canvas. The idea is to generate and draw the grid row by row; with the main part of the code looking something like this:
 
 ```javascript
 function draw_rule(ctx, rule, scale, width, height) {
@@ -89,7 +89,7 @@ function draw_rule(ctx, rule, scale, width, height) {
 }
 ```
 
-We start of with some initial collection of cells as our current row. This row, like in the examples above, usually contains all 0s except for a 1 in the middle cell, but it can also contain a completely random string on 1s and 0s. We draw this row of cells, then calculate the next row of values based on our current row, using our rule. Then we simply repeat drawing and calculating new steps until we feel that our grid is tall enough.
+We start off with some initial collection of cells as our current row. This row, like in the examples above, usually contains all 0s except for a 1 in the middle cell, but it can also contain a completely random string on 1s and 0s. We draw this row of cells, then calculate the next row of values based on our current row, using our rule. Then we simply repeat drawing and calculating new steps until we feel that our grid is tall enough.
 
 This pseudo code requires us to implement 3 functions: `initial_row`, `draw_row` and `next_row`.
 
@@ -129,9 +129,9 @@ function draw_row(ctx, row, scale) {
 }
 ```
 
-This is where we are heavily depending on our context object, utilizing no less than 5 different methods from it. Let's take a quick look at each one, and how we use them.
+This is where we are heavily depending on our context object, utilising no less than 5 different methods from it. Here is a quick look at each one, and how we use them.
 
-- `fillStyle` specifies what you want to fill your shapes with. It can be a color, like `"#f55"`, but also a gradient or a pattern. We use it to distinguish between 0-cells and 1-cells.
+- `fillStyle` specifies what you want to fill your shapes with. It can be a colour, like `"#f55"`, but also a gradient or a pattern. We use it to distinguish between 0-cells and 1-cells.
 - `fillRect(x, y, w, h)` draws a rectangle from point (x,y) with width w and height h, filled according to the `fillStyle`. Our rectangles are simple squares, but you might be surprised that they all are positioned in origo. This is because we use it in conjunction with `translate`.
 - `translate(x, y)` lets you move the whole coordinate system around. This persists, so it works as a great alternative to keeping track of the different positions of items. For instance, instead of calculating the position of each individual cell in our grid, we can just draw a cell, move to the right, draw a new cell and so on.
 - `save()` and `restore()` is used together with `translate` and other coordinate-transforming methods. We use them to _save_ the current coordinate system at a certain point, so that we at a later point may return to it (using _restore_). In our case, we save our coordinate system before we start drawing a row and move to the right. Then, when we are done drawing the row and are all the way to the right, we restore, so we get back to our initial state. Finally we move down so that we are ready to start drawing the next row.
@@ -162,13 +162,15 @@ window.onload = function() {
 
 We extract the canvas dimensions as individual variables together with the number of cells horizontally. Then, we calculate the `cell_scale` and 'cells_down' so that the grid fills the whole canvas while keeping cells square. This way, we can now easily change the "resolution" of our grid while still keeping it within the bounds of the canvas.
 
-![Resolution](img/resolution.png)
+![Resolution](https://i.ibb.co/BwWQHB4/resolution.png)
 
-...and that's it! The full code example can be seen [here](https://github.com/kgolid/cellular-automata-post/blob/master/index.js).
+...and that's it! The full code example is available on [github](https://github.com/kgolid/cellular-automata-post/blob/master/index.js) and as a codepen:
+
+<p class="codepen" data-height="265" data-theme-id="light" data-default-tab="js,result" data-user="kgolid" data-slug-hash="oNgZKqV" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="oNgZKqV">  <span>See the Pen <a href="https://codepen.io/kgolid/pen/oNgZKqV">  oNgZKqV</a> by Kjetil Golid (<a href="https://codepen.io/kgolid">@kgolid</a>)  on <a href="https://codepen.io">CodePen</a>.</span></p><script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
 ## Onward from here
 
-Having this setup now lets you explore all the 256 different rule one by one, either by iterating through each one by changing the code, or by letting the rule number be random at every page load. Either way, it is a great feeling to explore these unpredictable results within your own controlled environment.
+Having this setup now lets you explore all the 256 different rules one by one, either by iterating through each one by changing the code, or by letting the rule number be random at every page load. Either way, it is a great feeling to explore these unpredictable results within your own controlled environment.
 
 Another thing to explore is letting the initial cell state of our automata be random rather than our static "only 0s, but a single 1" state. This will yield even more unpredictable results. Such a variant of our `initial_row` can be written like this:
 
@@ -180,18 +182,18 @@ function random_initial_row(width) {
 
 You can see below how big of an effect this change in the initial row has on the output.
 
-![Random initial row](img/rand_init.png)
+![Random initial row](https://i.ibb.co/CVKp2wK/rand-init.png)
 
-This is only one of the things you can change though! Why limit ourselves to two colors? Why limit ourselves to squares? Why only 2 dimensions? Why only one rule at a time?
+This is only one of the things you can change though! Why limit ourselves to two states? (Going from 2 to 3 states actually increases the number of rules from 256 to 7 625 597 484 987!) Why limit ourselves to squares? Why only 2 dimensions? Why only one rule at a time?
 
-Below are some examples of ECA-based visualizations, but with an alternative `draw_rule` function, drawing lines in an isometric pattern rather than squares, then filling areas defined by those lines with colors. You can even choose to not display the separating lines at all, only showing the colors.
+Below are some examples of ECA-based visualisations, but with an alternative `draw_rule` function, drawing lines in an isometric pattern rather than squares, then filling areas defined by those lines with colours. You can even choose to not display the separating lines at all, only showing the colours.
 
-![Alternative display of cellular automata](img/hexa_progress.jpg)
+![Alternative display of cellular automata](https://i.ibb.co/GFZVfLD/hexa-progress.jpg)
 
 Taking it even further, one can start introducing symmetries, both rotational (middle row) or reflectional (bottom row).
 
-![Further variants of cellular automata](img/hexa_variant.jpg)
+![Further variants of cellular automata](https://i.ibb.co/jbzZVX0/hexa-variant.jpg)
 
-If you find the above visuals intriguing, feel free to check out [this interactive playground](https://generated.space/sketch/hatch-automata-full/#53:156:110), or even better, start from the code we've built here, and try coming up with you own ECA visualisation!
+If you find the above visuals intriguing, feel free to check out [this interactive playground](https://generated.space/sketch/hatch-automata-full/#53:156:110), or even better, start from the code we've built here and try coming up with your very own cellular automata!
 
 Good luck!
