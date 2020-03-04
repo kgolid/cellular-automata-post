@@ -1,8 +1,23 @@
 // Get bit at pos(ition) for num(ber)
-const get_bit = (num, pos) => (num >> pos) & 1;
+const get_bit = (num, base, size, pos) => {
+  return parseInt(
+    Number(num)
+      .toString(base)
+      .padStart(Math.pow(base, size), 0)
+      .split('')
+      .reverse()
+      .join('')
+      .charAt(pos)
+  );
+};
 
-// Combines 3 bits into an integer between 0 and 7
-const combine = (b1, b2, b3) => (b1 << 2) + (b2 << 1) + (b3 << 0);
+const combine = (bs, base) => {
+  return parseInt(bs.join(''), base);
+};
 
 // Returns given number in the form of a tertiary function (a rule)
-export const get_rule = num => (b1, b2, b3) => get_bit(num, combine(b1, b2, b3));
+export const get_rule = (base, num) => (...bs) =>
+  get_bit(num, base, bs.length, combine(bs, base));
+
+export const get_random_rule = (base, arity) =>
+  get_rule(base, Math.floor(Math.random() * Math.pow(base, Math.pow(base, arity))));
